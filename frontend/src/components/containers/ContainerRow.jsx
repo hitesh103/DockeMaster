@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Loader2, Terminal, RotateCcw, Square, Play, Trash2 } from 'lucide-react';
+import { Loader2, Terminal, RotateCcw, Square, Play, Trash2, BarChart2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { TableRow, TableCell } from '../ui/table';
 import { Badge } from '../ui/badge';
@@ -110,6 +110,15 @@ export default function ContainerRow({ container, onRefresh, isAdmin }) {
                   >
                     <Terminal className="h-3 w-3" />
                     Terminal
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={busy}
+                    onClick={() => navigate(`/metrics/${id}`)}
+                  >
+                    <BarChart2 className="h-3 w-3" />
+                    Metrics
                   </Button>
                 </>
               ) : (

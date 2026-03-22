@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -12,6 +12,7 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '
 import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
 import { Alert, AlertDescription } from '../components/ui/alert';
+import { ScrollArea } from '../components/ui/scroll-area';
 import {
   Select,
   SelectTrigger,
@@ -264,6 +265,109 @@ function DeployImageForm() {
     </Form>
   );
 }
+function GitDeployForm() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [logs, setLogs] = useState([]);
+  const [jobRunning, setJobRunning] = useState(false);
+  const wsRef = useRef(null);
+  const scrollRef = useRef(null);
+
+  const { register, handleSubmit, formState: { errors } } = useForm({
+    defaultValues: { repositoryUrl: '', branch: 'main', dockerfilePath: 'Dockerfile', imageTag: '' },
+  });
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [logs]);
+
+  async function onSubmit(values) {
+    setError(null);
+    setLogs([]);
+    setLoading(true);
+
+    try {
+      const { data } = await api.post('/deploy/git', {
+        repositoryUrl: values.repositoryUrl,
+        branch: values.branch || 'main',
+        dockerfilePath: values.dockerfilePath || 'Dockerfile',
+        imageTag: values.imageTag || undefined,
+      });
+
+      const { jobId } = data;
+      setLoading(false);
+      setJobRunning(true);
+
+      const token = localStorage.getItem('dockmaster_token');
+      const ws = new WebSocket(`ws://localhost:4000/api/deploy/git/${jobId}/logs?token=${token}`);
+      wsRef.current = ws;
+
+      ws.onmessage = (e) => setLogs((prev) => [...prev, e.data]);
+      ws.onclose = () => setJobRunning(false);
+      ws.onerror = () => {
+        setJobRunning(false);
+        toast.error('Build log connection failed');
+      };
+    } catch (err) {
+      setLoading(false);
+      if (err.response?.status === 422) {
+        setError(err.response.data?.error || 'Validation error');
+      } else {
+        toast.error(err.response?.data?.error || 'Deploy failed');
+      }
+    }
+  }
+
+  return (
+    <div className="space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <div className="space-y-1">
+          <label className="text-sm font-medium">Repository URL *</label>
+          <Input placeholder="https://github.com/user/repo.git" {...register('repositoryUrl', { required: true })} />
+          {errors.repositoryUrl && <p className="text-xs text-destructive">Repository URL is required</p>}
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1">
+            <label className="text-sm font-medium">Branch</label>
+            <Input placeholder="main" {...register('branch')} />
+          </div>
+          <div className="space-y-1">
+            <label className="text-sm font-medium">Dockerfile Path</label>
+            <Input placeholder="Dockerfile" {...register('dockerfilePath')} />
+          </div>
+        </div>
+        <div className="space-y-1">
+          <label className="text-sm font-medium">Image Tag</label>
+          <Input placeholder="my-app:latest (optional)" {...register('imageTag')} />
+        </div>
+
+        {error && (
+          <Alert variant="destructive">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
+        <Button type="submit" disabled={loading || jobRunning} className="w-full">
+          {loading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+          {loading ? 'Starting...' : jobRunning ? 'Building...' : 'Deploy from Git'}
+        </Button>
+      </form>
+
+      {logs.length > 0 && (
+        <div className="space-y-1">
+          <p className="text-xs text-muted-foreground font-medium">Build Output</p>
+          <ScrollArea className="h-64 rounded-md border bg-black p-3">
+            <pre ref={scrollRef} className="text-xs font-mono text-green-400 whitespace-pre-wrap">
+              {logs.join('')}
+            </pre>
+          </ScrollArea>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function DeployPage() {
   return (
@@ -282,7 +386,7 @@ export default function DeployPage() {
               <DeployImageForm />
             </TabsContent>
             <TabsContent value="git">
-              <p className="text-muted-foreground text-sm">Coming soon</p>
+              <GitDeployForm />
             </TabsContent>
           </Tabs>
         </CardContent>

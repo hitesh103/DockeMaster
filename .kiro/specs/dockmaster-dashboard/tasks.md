@@ -171,7 +171,7 @@ Incremental implementation across four phases. Each task builds on the previous,
   - Ensure all tests pass, ask the user if questions arise.
 
 
-- [ ] 12. Backend: WebSocket server setup and container log streaming
+- [x] 12. Backend: WebSocket server setup and container log streaming
   - Install and configure `ws` library; attach WebSocket server to the existing HTTP server in `app.js`; add JWT verification on upgrade via `?token=` query param
   - Create `backend/src/ws/logs_ws.js` — handle `/api/containers/:id/logs`; call `container.logs({ follow: true, stdout: true, stderr: true, tail })` and pipe chunks to the WebSocket client
   - Create `backend/src/ws/terminal_ws.js` — handle `/api/containers/:id/terminal`; create exec session with `AttachStdin/Stdout/Stderr/Tty: true`; relay keystrokes from WS to exec stdin; relay exec output to WS; terminate exec on WS close
@@ -182,7 +182,7 @@ Incremental implementation across four phases. Each task builds on the previous,
     - **Validates: Requirements 8.4, 8.5**
     - Arbitrary: `fc.array(fc.uint8Array())`
 
-- [ ] 13. Frontend: Log viewer page
+- [x] 13. Frontend: Log viewer page
   - Create `frontend/src/hooks/useContainerLogs.js` — manages WebSocket lifecycle; exposes `lines`, `connected`, `reconnect()`; appends incoming lines to state array
   - Create `frontend/src/pages/LogsPage.jsx` — shadcn/ui `ScrollArea` in monospace font; tail selector (50/100/500/All) that closes and reopens WS with new `tail` param; "Disconnected" Badge + Reconnect button on WS close; "Download logs" button that saves buffered lines as `.txt`
   - _Requirements: 6.1, 6.2, 6.4, 6.5, 6.6_
@@ -198,7 +198,7 @@ Incremental implementation across four phases. Each task builds on the previous,
     - Arbitrary: `fc.constantFrom(50, 100, 500, 'all')`
 
 
-- [ ] 14. Frontend: Container browser terminal page
+- [x] 14. Frontend: Container browser terminal page
   - Install `xterm` and `xterm-addon-fit` in frontend
   - Create `frontend/src/pages/TerminalPage.jsx` — renders xterm.js `Terminal` inside a shadcn/ui Dialog or full page; connects to `ws://host/api/containers/:id/terminal`; sends keystrokes via `terminal.onData`; writes incoming bytes via `terminal.write`; uses `FitAddon` to resize on window resize
   - Disable "Open Terminal" button in `ContainerRow` when container state is not `running`; show tooltip explaining requirement
@@ -209,7 +209,7 @@ Incremental implementation across four phases. Each task builds on the previous,
     - **Validates: Requirements 8.7**
     - Arbitrary: `fc.constantFrom('exited','paused','created')`
 
-- [ ] 15. Backend: Per-container stats endpoint and stats WebSocket stream
+- [x] 15. Backend: Per-container stats endpoint and stats WebSocket stream
   - Add `GET /api/containers/:id/stats` to containers router — calls `container.stats({ stream: false })`, computes CPU % from delta CPU / system delta, returns `{ containerId, name, cpu, memory, networkRx, networkTx, timestamp }`
   - Create `backend/src/services/stats_service.js` — polls all running containers every 5s; broadcasts `{ containers: [...] }` JSON to all connected `/api/stats/stream` clients
   - Create `backend/src/ws/stats_ws.js` — handle `/api/stats/stream`; register/deregister clients with `stats_service`
@@ -225,7 +225,7 @@ Incremental implementation across four phases. Each task builds on the previous,
     - Use fake timers
 
 
-- [ ] 16. Frontend: Per-container metrics page and dashboard home stat cards
+- [x] 16. Frontend: Per-container metrics page and dashboard home stat cards
   - Create `frontend/src/hooks/useContainerStats.js` — polls `GET /api/containers/:id/stats` every 2s; keeps last 60 snapshots in state
   - Create `frontend/src/pages/MetricsPage.jsx` — shadcn/ui `ChartContainer` (Recharts) area charts for CPU %, memory MB, network RX/TX; apply warning color class when CPU > 80%; cap at 60 data points
   - Create `frontend/src/hooks/useGlobalStats.js` — connects to `ws://host/api/stats/stream`; keeps last 30 snapshots
@@ -247,11 +247,11 @@ Incremental implementation across four phases. Each task builds on the previous,
     - **Validates: Requirements 16.5**
     - Arbitrary: `fc.array(globalStatsArb, { minLength: 31, maxLength: 100 })`
 
-- [ ] 17. Checkpoint — Ensure all Phase 2 WebSocket and metrics tests pass
+- [x] 17. Checkpoint — Ensure all Phase 2 WebSocket and metrics tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 
-- [ ] 18. Backend: Git deploy service and build log WebSocket
+- [x] 18. Backend: Git deploy service and build log WebSocket
   - Create `backend/src/services/deploy_service.js` — `gitDeploy({ repositoryUrl, branch, dockerfilePath, imageTag, env })`: uses `simple-git` to clone to a temp dir, spawns `docker build` via `child_process`, streams stdout/stderr to a job log buffer, cleans up temp dir on completion (success or failure); returns `jobId`
   - Create `backend/src/api/deploy.js` — `POST /api/deploy/git` starts job, returns `{ jobId }`; apply `requireAuth` + `requireAdmin`
   - Create `backend/src/ws/git_logs_ws.js` — handle `/api/deploy/git/:jobId/logs`; stream buffered + live build log lines to client
@@ -263,12 +263,12 @@ Incremental implementation across four phases. Each task builds on the previous,
     - **Validates: Requirements 9.7**
     - Arbitrary: `fc.record(gitDeployArb)`
 
-- [ ] 19. Frontend: Git deploy tab on Deploy page
+- [x] 19. Frontend: Git deploy tab on Deploy page
   - Add a "Deploy from Git" tab to `DeployPage.jsx` — fields for repository URL, branch, Dockerfile path, image tag, env vars; on submit calls `POST /api/deploy/git`, then opens WS to `ws://host/api/deploy/git/:jobId/logs` and streams build output into a scrollable log panel; show Alert on 422
   - _Requirements: 9.1, 9.4, 9.5, 9.6_
 
 
-- [ ] 20. Backend: Registry service and API
+- [x] 20. Backend: Registry service and API
   - Create `backend/src/services/registry_service.js` — CRUD for registry configs in SQLite; encrypt password with AES-256-GCM before storing; `testConnection(id)` authenticates against registry; `listImages(id)` calls Docker Registry HTTP API v2 `/v2/_catalog`; `pull(imageRef, registryId)` calls `docker.pull` with auth options
   - Create `backend/src/api/registries.js` — `GET /api/registries`, `POST /api/registries`, `GET /api/registries/:id/images`, `POST /api/registries/:id/test`; strip password from GET responses
   - Wire registries router into `app.js`
@@ -279,12 +279,12 @@ Incremental implementation across four phases. Each task builds on the previous,
     - **Validates: Requirements 10.3**
     - Arbitrary: `fc.array(registryArb)`
 
-- [ ] 21. Frontend: Registries page
+- [x] 21. Frontend: Registries page
   - Create `frontend/src/pages/RegistriesPage.jsx` — list registries with name, URL, status; "Add Registry" form (shadcn/ui Form) with name, URL, username, password; "Test Connection" button per row; show Toast on auth failure
   - _Requirements: 10.1, 10.2, 10.4, 10.7_
 
 
-- [ ] 22. Backend: Swarm services, stacks, volumes, and networks APIs
+- [x] 22. Backend: Swarm services, stacks, volumes, and networks APIs
   - Create `backend/src/services/swarm_service.js` — `listServices()`, `scaleService(id, replicas)`, `removeService(id)`, `listStacks()`, `deployStack(name, yaml)`, `removeStack(name)`; return 503 if Docker not in Swarm mode
   - Create `backend/src/api/services.js` — `GET /api/services`, `POST /api/services/:id/scale`, `DELETE /api/services/:id`
   - Create `backend/src/api/stacks.js` — `GET /api/stacks`, `POST /api/stacks`, `DELETE /api/stacks/:name`; validate YAML before deploy, return 422 on parse error
@@ -298,7 +298,7 @@ Incremental implementation across four phases. Each task builds on the previous,
     - **Validates: Requirements 11.4**
     - Arbitrary: `fc.integer({ min: 0, max: 100 })`
 
-- [ ] 23. Frontend: Services, Stacks, Volumes, and Networks pages
+- [x] 23. Frontend: Services, Stacks, Volumes, and Networks pages
   - Create `frontend/src/pages/ServicesPage.jsx` — shadcn/ui Table with service name, image, replicas (current/desired), update status; Scale button opens Dialog with numeric input; show Alert on 503
   - Create `frontend/src/pages/StacksPage.jsx` — list stacks; "Deploy Stack" Dialog with name field + YAML textarea; show Alert on 422
   - Create `frontend/src/pages/VolumesPage.jsx` — Table with name, driver, mount point, in-use status; Remove button; Toast on 409
@@ -316,7 +316,7 @@ Incremental implementation across four phases. Each task builds on the previous,
     - Arbitrary: `fc.array(networkArb)`
 
 
-- [ ] 24. Backend: Node management API
+- [x] 24. Backend: Node management API
   - Create `backend/src/services/node_client.js` — map of `nodeId → Dockerode` instances; `addNode(config)` creates instance with TCP + optional TLS; `pingNode(id)` with 5s timeout
   - Create `backend/src/api/nodes.js` — `GET /api/nodes`, `POST /api/nodes`, `DELETE /api/nodes/:id`, `GET /api/nodes/:id/health`; health check returns `{ reachable: bool }` within 5s
   - Wire nodes router into `app.js`
@@ -327,26 +327,26 @@ Incremental implementation across four phases. Each task builds on the previous,
     - **Validates: Requirements 19.4**
     - Arbitrary: `fc.record(nodeArb)`
 
-- [ ] 25. Frontend: Nodes page
+- [x] 25. Frontend: Nodes page
   - Create `frontend/src/pages/NodesPage.jsx` — Table with hostname, IP, Docker version, status Badge (Reachable/Unreachable), Swarm role; "Add Node" form with hostname, IP, port, TLS cert upload; "Unreachable" Badge when health check fails
   - _Requirements: 19.1, 19.2, 19.5_
 
-- [ ] 26. Checkpoint — Ensure all Phase 2 infrastructure tests pass
+- [x] 26. Checkpoint — Ensure all Phase 2 infrastructure tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 
-- [ ] 27. Backend: User management API
+- [x] 27. Backend: User management API
   - Create `backend/src/api/users.js` — `GET /api/users`, `POST /api/users`, `PUT /api/users/:id`, `DELETE /api/users/:id`; all protected by `requireAuth` + `requireAdmin`; `POST` hashes password with bcrypt; `PUT` for role change does not invalidate existing tokens (reflected on next login per Requirement 14.6)
   - Wire users router into `app.js`
   - _Requirements: 14.3, 14.5, 14.6_
 
-- [ ] 28. Frontend: Users management page and audit logs page
+- [x] 28. Frontend: Users management page and audit logs page
   - Create `frontend/src/pages/UsersPage.jsx` — Admin-only page; Table with username and role; "Create User" Dialog (shadcn/ui Form) with username, password, role dropdown; Edit and Delete buttons per row
   - Create `frontend/src/pages/AuditLogsPage.jsx` — paginated shadcn/ui Table (50/page) sorted by timestamp desc; filter controls for actor, action type, date range; failure rows rendered with error color
   - _Requirements: 14.3, 14.4, 15.2, 15.3, 15.5_
 
 
-- [ ] 29. Backend: Alert service — crash detection and CPU threshold alerts
+- [x] 29. Backend: Alert service — crash detection and CPU threshold alerts
   - Create `backend/src/services/alert_service.js` — subscribe to `docker.getEvents()` and detect `die` events; trigger alert when exit code ≠ 0; track per-container consecutive CPU breach count; trigger alert after 3 consecutive polls above threshold; dispatch to email (nodemailer) and/or webhook (HTTP POST); retry email once after 60s on failure; expose `saveConfig(config)` and `getConfig()` (redact SMTP password and webhook token in GET)
   - Create `backend/src/api/alerts.js` — `GET /api/alerts/config` and `POST /api/alerts/config`; apply `requireAuth` + `requireAdmin`
   - Wire alerts router into `app.js`; start event listener on app startup
@@ -370,24 +370,24 @@ Incremental implementation across four phases. Each task builds on the previous,
     - **Validates: Requirements 17.5**
     - Arbitrary: `fc.record(alertConfigArb)`
 
-- [ ] 30. Frontend: Alerts settings page
+- [x] 30. Frontend: Alerts settings page
   - Create `frontend/src/pages/AlertsSettingsPage.jsx` — shadcn/ui Form with CPU threshold input, email recipients, SMTP settings, webhook URL; save calls `POST /api/alerts/config`; load current config from `GET /api/alerts/config` on mount
   - _Requirements: 17.7_
 
 
-- [ ] 31. Wire all frontend routes into the Router
+- [x] 31. Wire all frontend routes into the Router
   - Update `App.jsx` route tree to include all pages under `ProtectedLayout`: `/` (DashboardHome), `/containers`, `/containers/:id`, `/images`, `/stacks`, `/services`, `/registries`, `/deploy`, `/terminal/:id`, `/logs/:id`, `/metrics/:id`, `/nodes`, `/volumes`, `/networks`, `/users` (Admin only), `/audit-logs`, `/alerts`
   - Ensure Sidebar nav links match all routes; active link highlighting works for all entries
   - Add Admin-only route guard for `/users` that redirects Viewers to `/`
   - _Requirements: 1.1, 1.2, 14.3_
 
-- [ ] 32. Backend: Global error handler and HTTP error conventions
+- [x] 32. Backend: Global error handler and HTTP error conventions
   - Update the Express global error handler in `app.js` to map Dockerode error codes to correct HTTP statuses (404 for "no such container/image", 409 for "conflict", 503 for "Swarm not active")
   - Ensure no stack traces are exposed in production responses
   - Add `express.json()` parse error handler returning 400 with descriptive message
   - _Requirements: 20.1, 20.4_
 
-- [ ] 33. Frontend: Global error handling wiring
+- [x] 33. Frontend: Global error handling wiring
   - Ensure Axios interceptors in `api.js` handle all error conventions: 401 → redirect to login + clear localStorage; 403 → Toast "You don't have permission"; 409 → Toast with conflict detail; 422 → inline Alert in relevant form; 500 → generic Toast
   - Ensure all WebSocket hooks set `connected: false` on close and expose `reconnect()` that re-opens the connection
   - _Requirements: 2.6, 4.4, 5.5, 6.5, 11.7, 12.5, 18.5_
