@@ -1,8 +1,12 @@
-# 🚢 DockMaster — Container Management Dashboard
+# DockMaster — Container Management Dashboard
+
+> **Status:** This project is still in the development phase.
 
 **DockMaster** is a powerful, self-hosted alternative to Portainer. It provides a centralized web dashboard to manage Docker containers across multiple servers using Docker Swarm. From launching containers to monitoring, restarting, scaling, or deploying from Git repositories — all in one clean UI.
 
-> 🛠️ Built for developers, DevOps teams, and sysadmins who want full control over their container infrastructure.
+> Built for developers, DevOps teams, and sysadmins who want full control over their container infrastructure.
+
+![DockMaster Dashboard](docs/screenshot.png)
 
 ---
 
