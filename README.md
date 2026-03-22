@@ -6,7 +6,7 @@
 
 > Built for developers, DevOps teams, and sysadmins who want full control over their container infrastructure.
 
-![DockMaster Dashboard](https://api2-hu144ap.transloadit.com/resumable/files/c94e1a93eede44f8a35a43ecd2226a80_65bd0096351e1f7de4b64cc963213b7b)
+![DockMaster Dashboard](https://cdn2.allevents.in/transup/31/c27a6ddef141089d8ef1d8e05640f7/Screenshot-2026-03-22-at-3.10.16-PM.png)
 
 ---
 
