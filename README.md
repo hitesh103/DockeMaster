@@ -80,22 +80,22 @@
 - [x] React dashboard showing containers & actions
 - [x] Deploy containers from form (image name, env, etc.)
 
-### 🚧 Phase 2: Core Infrastructure
-- [ ] Git-based deploy with optional build
-- [ ] Docker registry integration
-- [ ] Logs and resource metrics (stats)
-- [ ] Swarm services & scaling controls
-- [ ] Container terminal (WebSocket shell)
+### ✅ Phase 2: Core Infrastructure
+- [x] Git-based deploy with optional build
+- [x] Docker registry integration
+- [x] Logs and resource metrics (stats)
+- [x] Swarm services & scaling controls
+- [x] Container terminal (WebSocket shell)
 
-### 🔒 Phase 3: Security & Access
-- [ ] JWT auth with sessions
-- [ ] RBAC (Admin, Viewer, Node-Owner)
-- [ ] Audit logs and actions history
+### ✅ Phase 3: Security & Access
+- [x] JWT auth with sessions
+- [x] RBAC (Admin, Viewer, Node-Owner)
+- [x] Audit logs and actions history
 
-### 📈 Phase 4: Monitoring & Alerts
-- [ ] Real-time resource graphs
-- [ ] Crash/health alerts via email or webhook
-- [ ] Slack/Telegram integrations
+### ✅ Phase 4: Monitoring & Alerts
+- [x] Real-time resource graphs
+- [x] Crash/health alerts via email or webhook
+- [x] Slack/Telegram integrations
 
 ---
 
